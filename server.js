@@ -22,9 +22,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // Utilisation des routes pour l'authentification
 
-// Middleware pour gérer les cors
-app.use(cors(corsOptions));
-
 // Configuration des options cors
 const corsOptions = {
     credentials: true,
@@ -32,6 +29,9 @@ const corsOptions = {
     methods: 'GET, HEAD, PUT, PATCH, POST, DELETE',
     preflightContinue: false,
 };
+
+// Middleware pour gérer les cors
+app.use(cors(corsOptions));
 
 // Définition du port demarrage du serveur
 const PORT = process.env.PORT || 5200;
@@ -41,7 +41,7 @@ const start = async () => {
     try {
         // Connexion a la base de donnée
         // Démarrage du serveur sur le port spécifié
-        app.listen(PORT, () => console.log('Le serveur a démarré sur le port ${PORT}'));
+        app.listen(PORT, () => console.log(`Le serveur a démarré sur le port ${PORT}`));
     } catch (error) {
         console.log(error);
     }
