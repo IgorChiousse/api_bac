@@ -42,7 +42,6 @@ const start = async () => {
     try {
         // Connexion a la base de donnée
         await connectDB();
-        console.log(`Connexion avec la base de données réussi`);
         // Démarrage du serveur sur le port spécifié
         app.listen(PORT, () => console.log(`Le serveur a démarré sur le port ${PORT}`));
     } catch (error) {

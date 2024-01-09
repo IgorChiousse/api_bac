@@ -5,10 +5,10 @@ FROM node:18
 WORKDIR /usr/src/app
 
 # Copie des fichiers package.json et package-lock.json pour installer les dépendances
-COPY package*.json ./
+COPY package*.json yarn.lock* ./
 
 # Installation des dépendances
-RUN yarn installer
+RUN yarn install
 
 # Copie du code source de l'application dans l'image
 COPY . .
@@ -17,5 +17,5 @@ COPY . .
 EXPOSE 5000
 
 # Commande pour démarrer votre application Node.js
-CMD ["node", "server.js"]
+CMD ["yarn", "start"]
 
