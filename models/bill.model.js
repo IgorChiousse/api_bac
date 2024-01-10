@@ -22,7 +22,6 @@ const billSchema = new mongoose.Schema({
 	createdBy: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: 'User',
-		required: true,
 	},
 	timestamp: {
 		type: Date,
