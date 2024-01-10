@@ -1,4 +1,4 @@
-// Chargement des variables d'environnement 
+// Chargement des variables d'environnement
 require('dotenv').config();
 
 // Import des modules necessaires
@@ -9,10 +9,13 @@ const cors = require('cors');
 // Import des routes pour l'authentification
 const authRoutes = require('./routes/auth.route');
 
+// Import des routes pour la création des produits
+const billRoutes = require('./routes/bill.route');
+
 // Import de la configuration de la base de données
 const connectDB = require('./config/db');
 
-// Initialisation de l'application Express 
+// Initialisation de l'application Express
 const app = express();
 
 // Middleware pour traiter les requêtes JSON
@@ -25,12 +28,15 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Utilisation des routes pour l'authentification
 app.use('/api', authRoutes);
 
+// Utilisation des routes pour la creation des produits
+app.use('/api', billRoutes);
+
 // Configuration des options cors
 const corsOptions = {
-    credentials: true,
-    optionsSuccessStatus: 200,
-    methods: 'GET, HEAD, PUT, PATCH, POST, DELETE',
-    preflightContinue: false,
+	credentials: true,
+	optionsSuccessStatus: 200,
+	methods: 'GET, HEAD, PUT, PATCH, POST, DELETE',
+	preflightContinue: false,
 };
 
 // Middleware pour gérer les cors
@@ -41,15 +47,15 @@ const PORT = process.env.PORT || 5200;
 
 // Fonction pour demarrer le serveur
 const start = async () => {
-    try {
-        // Connexion a la base de donnée
-        await connectDB();
-        // Démarrage du serveur sur le port spécifié
-        app.listen(PORT, () => console.log(`Le serveur a démarré sur le port ${PORT}`));
-    } catch (error) {
-        console.log(error);
-    }
-}
+	try {
+		// Connexion a la base de donnée
+		await connectDB();
+		// Démarrage du serveur sur le port spécifié
+		app.listen(PORT, () => console.log(`Le serveur a démarré sur le port ${PORT}`));
+	} catch (error) {
+		console.log(error);
+	}
+};
 
 // Apple de la fonction pour demarrer le serveur
 start();

@@ -2,11 +2,11 @@
 const mongoose = require('mongoose');
 
 // Définition du shéma du produit
-const productSchema = new mongoose.Schema({
-	image: {
-		type: String,
-		required: true,
-	},
+const billSchema = new mongoose.Schema({
+	// image: {
+	// 	type: String,
+	// 	required: true,
+	// },
 	title: {
 		type: String,
 		required: [true, 'Veuillez entrer votre produit'],
@@ -31,7 +31,7 @@ const productSchema = new mongoose.Schema({
 });
 
 // Export du model et du schema et mis dans la variable user
-const Product = mongoose.model('Product', productSchema);
+const Bill = mongoose.model('Bill', billSchema);
 
 // Export de la variable user
-module.exports = Product;
+module.exports = Bill;
