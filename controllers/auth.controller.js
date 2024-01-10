@@ -34,7 +34,7 @@ module.exports.register = async (req, res) => {
         const existingUser = await authModel.findOne({email});
         // Renvoie une erreur si l email exist deja
         if(existingUser) {
-            return res.status(400).json({ message: 'l email existe deja'})
+            return res.status(400).json({ message: "l'email existe deja"})
         }
         // Création d un nouvel utilisateur
         const user = authModel.create({lastname, firstname, email, password});
@@ -47,3 +47,59 @@ module.exports.register = async (req, res) => {
     }
 
 };
+
+// Fonction pour la connection
+module.exports.login = async (req, res) => {
+    try {
+        // Recuperation des erreurs de validations
+        const errors = validationResult(req);
+        // Verification si il y a des erreurs de validation
+        if(!errors.isEmpty()) {
+            // Renvoie des erreurs de validation
+            return res.status(400).json({ errors: errors.array() });
+        }
+        // Recuperation des donnees du formulaire
+        const { email, password } = req.body;
+        
+        // Verification si l'utilisateur existe deja dans la base de donnees
+        const user = await authModel.findOne({ email });
+
+        // Si l'utilisateur n'existe pas, renvoie une erreur
+        if (!user) {
+            console.log("Utilisateur non trouvé");
+            return res.status(400).json({ message: "Email invalide" });
+        }
+        // Verification du mot de passe
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+
+        // Si le mot de passe est incorrect, renvoie une erreur
+        if (!isPasswordValid) {
+            console.log('Mot de passe incorrect');
+            return res.status(400).json({message: 'Mot de passe incorrect'})
+        }
+        // Renvoie d'un message de succes
+        console.log('Connection réussie !');
+
+        // Creation du token jwt
+        const payload = {
+            user: {
+                id: user._id,
+                email: user.email,
+            }
+        };
+        // Definition de la variable pour le token
+        const secretKey = process.env.JWT_SECRET;
+
+        // Definition de la date d'expiration du token
+        const token = jwt.sign(payload, secretKey, { expiresIn: '1h' });
+
+        // Renvoie un message de reussite et le totken
+        res.status(200).json({message: 'Connection réussie', token})
+
+    } catch (error) {
+        console.error('Erreur lors de connection : ', error.message);
+        // Renvoie une erreur si il y a un probleme lors de la connection de l'utilisateur
+        res.status(500).json({message: 'Erreur lors de la connection'});
+    }
+};
+
