@@ -34,6 +34,6 @@ module.exports.authenticate = async (req, res, next) => {
 		next();
 	} catch (error) {
 		console.error("Erreur lors de l'authentification", error.message);
-		res.status(500).json({ message: 'Erreur lors de lauthentification' });
+		res.status(500).json({ message: "Erreur lors de l'authentification" });
 	}
 };
