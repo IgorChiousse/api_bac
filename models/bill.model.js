@@ -7,6 +7,10 @@ const billSchema = new mongoose.Schema({
 	// 	type: String,
 	// 	required: true,
 	// },
+	createdBy: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: 'User',
+	},
 	title: {
 		type: String,
 		required: [true, 'Veuillez entrer votre produit'],
@@ -19,9 +23,9 @@ const billSchema = new mongoose.Schema({
 		type: Number,
 		required: [true, 'Veuillez entrer votre prix'],
 	},
-	createdBy: {
-		type: mongoose.Schema.Types.ObjectId,
-		ref: 'User',
+	date: {
+		type: Date,
+		default: Date.now,
 	},
 	timestamp: {
 		type: Date,
