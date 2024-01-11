@@ -3,10 +3,6 @@ const mongoose = require('mongoose');
 
 // Définition du shéma du produit
 const billSchema = new mongoose.Schema({
-	// image: {
-	// 	type: String,
-	// 	required: true,
-	// },
 	createdBy: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: 'User',
@@ -26,6 +22,9 @@ const billSchema = new mongoose.Schema({
 	date: {
 		type: Date,
 		default: Date.now,
+	},
+	imageUrl: {
+		type: String,
 	},
 	timestamp: {
 		type: Date,
