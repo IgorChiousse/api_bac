@@ -10,6 +10,9 @@ const bcrypt = require('bcryptjs');
 // Import du model jwt pour les tokens
 const jwt = require('jsonwebtoken');
 
+// Import du module validator pour email
+const validator = require('validator');
+
 // fonction pour l inscription
 module.exports.register = async (req, res) => {
 	// Validation des données d'entrée
@@ -31,6 +34,11 @@ module.exports.register = async (req, res) => {
 			return res
 				.status(400)
 				.json({ message: 'le mot de passe doit contenir au moins 6 caractère' });
+		}
+		// Vérification de la validité de l email avec validator
+		if (!validator.isEmail(email)) {
+			// Renvoie une erreur si l email est invalide
+			return res.status(400).json({ message: 'Entrer un email valide' });
 		}
 		// Vérification de l email si il existe deja dans la base de données
 		const existingUser = await authModel.findOne({ email });
