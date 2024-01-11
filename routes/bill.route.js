@@ -11,6 +11,14 @@ router.post(
 	billController.createBill
 );
 
+// Route pour la modifier de facture en tant qu'admin en drenant en compte authMiddleware.authenticate
+router.put(
+	'/update-bill/:id',
+	authMiddleware.authenticate,
+	upload.single('image'),
+	billController.updateBill
+);
+
 // Route pour récupérer toutes les factures
 router.get('/all-bill', billController.getAllBills);
 
