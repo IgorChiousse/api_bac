@@ -12,9 +12,24 @@ module.exports.createBill = async (req, res) => {
 				.json({ message: 'Action non autorisé. Seul un admin peu créer un produit' });
 		}
 		// Récupération des données du formulaire
-		const { title, description, price } = req.body;
+		const { title, description, price, date } = req.body;
+		// Vérification si une image est téléchargé
+		if (!req.file) {
+			return res.status(400).json({ message: 'veuillez télécharger une image' });
+		}
+		// Déclaration de variable pour récupérer le chemin de l'image après téléchargement
+		const imageUrl = req.file.path;
+		// Déclaration de variable pour récupérer l'id de l'utilisateur qui va poster une facture
+		const userId = req.user._id;
 		// Création d une facture
-		const newBill = await billModel.create({ title, description, price });
+		const newBill = await billModel.create({
+			title,
+			description,
+			price,
+			date,
+			imageUrl,
+			createdBy,
+		});
 		// Renvoie une réponse positif si la facture est bien enregistrer
 		res.status(201).json({ message: 'Facture créée avec succès', bill: newBill });
 
