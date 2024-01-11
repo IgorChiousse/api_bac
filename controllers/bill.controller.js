@@ -52,3 +52,22 @@ module.exports.getAllBills = async (req, res) => {
 		res.status(500).json({ message: 'Erreur lors de la récupération des factures' });
 	}
 };
+
+// Fonction qui va permettre de récupérer une seule facture par son id
+module.exports.getBillById = async (req, res) => {
+	try {
+		// Déclaration de la variable qui va rechercher l'id de la facture
+		const billId = req.params.id;
+		// Récupération de la facture par son id
+		const bill = await billModel.findById(billId);
+		// condition si la facture est introuvable
+		if (!bill) {
+			return res.status(404).json({ message: 'Facture non trouvée' });
+		}
+		// réponse de succès
+		res.status(200).json({ message: 'Factures trouvée avec succès', bill });
+	} catch (error) {
+		console.error('Erreur lors de la récupération de la facture : ', error.message);
+		res.status(500).json({ message: 'Erreur lors de la récupération de la facture' });
+	}
+};

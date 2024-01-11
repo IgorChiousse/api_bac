@@ -14,4 +14,7 @@ router.post(
 // Route pour récupérer toutes les factures
 router.get('/all-bill', billController.getAllBills);
 
+// Route pour récupérer une seule facture avec son id
+router.get('/bill/:id', billController.getBillById);
+
 module.exports = router;
