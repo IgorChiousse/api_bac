@@ -11,4 +11,7 @@ router.post(
 	billController.createBill
 );
 
+// Route pour récupérer toutes les factures
+router.get('/all-bill', billController.getAllBills);
+
 module.exports = router;
