@@ -9,7 +9,7 @@ module.exports.createBill = async (req, res) => {
 			// Retour d un message d erreur
 			return res
 				.status(403)
-				.json({ message: 'Action non autorisé. Seul un admin peu créer un produit' });
+				.json({ message: 'Action non autorisé. Seul un admin peu créer une facture' });
 		}
 		// Récupération des données du formulaire
 		const { title, description, price, date } = req.body;
@@ -69,5 +69,30 @@ module.exports.getBillById = async (req, res) => {
 	} catch (error) {
 		console.error('Erreur lors de la récupération de la facture : ', error.message);
 		res.status(500).json({ message: 'Erreur lors de la récupération de la facture' });
+	}
+};
+
+// Fonction pour suppprimer une facture par son id
+module.exports.deleteBill = async (req, res) => {
+	try {
+		// Vérifier si l utilisateur est admin
+		if (req.user.role !== 'admin') {
+			// Retour d un message d erreur
+			return res
+				.status(403)
+				.json({ message: 'Action non autorisé. Seul un admin peu supprimer une facture' });
+		}
+		// Récupérer l id de la facture
+		const billId = req.params.id;
+		// Supprimer la facture
+		const deletedBill = await billModel.findByIdAndDelete(billId);
+		// Condition si la facture est introuvable
+		if (!deleteBill) {
+			return res.status(404).json({ message: 'facture non trouvée' });
+		}
+		res.status(200).json({ message: 'Facture supprimer avec succès' });
+	} catch (error) {
+		console.error('Erreur lors de la récupération de la facture : ', error.message);
+		res.status(500).json({ message: 'Erreur lors de la suppression de la facture' });
 	}
 };
