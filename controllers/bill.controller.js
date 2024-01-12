@@ -119,7 +119,7 @@ module.exports.updateBill = async (req, res) => {
 		existingBill.title = req.body.title || existingBill.title;
 		existingBill.description = req.body.description || existingBill.description;
 		existingBill.price = req.body.price || existingBill.price;
-		existingBill.date = req.body.Date || existingBill.date;
+		existingBill.date = req.body.date || existingBill.date;
 
 		// Vérifier si une nouvelle image est téléchargé, mettre à jour le chemin de l image
 		if (req.file) {
