@@ -8,6 +8,8 @@ router.post('/register', authController.register);
 // Route pour la connection
 router.post('/login', authController.login);
 
+// Route pour le mot de passe oublié
+
 // Route protégée
 router.get('/dashboard', authMiddleware.authenticate, (req, res) => {
 	// Vérifier si l'utilisateur est un admin
@@ -18,11 +20,9 @@ router.get('/dashboard', authMiddleware.authenticate, (req, res) => {
 		return res.status(200).json({ message: 'Bienvenue Admin' });
 	} else {
 		// Envoyer une réponse pour les utilisateurs non admin
-		return res
-			.status(403)
-			.json({
-				message: 'action non autorisée, seul les admins peuvent accéder à cette page',
-			});
+		return res.status(403).json({
+			message: 'action non autorisée, seul les admins peuvent accéder à cette page',
+		});
 	}
 });
 

@@ -25,7 +25,7 @@ module.exports.register = async (req, res) => {
 			return res.status(400).json({ errors: errors.array() });
 		}
 		// Récupération des données du formulaire
-		const { lastname, firstname, email, password } = req.body;
+		const { email, password } = req.body;
 
 		// Vérification de la longueur du mot de passe avec une condition
 		if (password.length < 6) {
@@ -47,7 +47,7 @@ module.exports.register = async (req, res) => {
 			return res.status(400).json({ message: "l'email existe deja" });
 		}
 		// Création d un nouvel utilisateur
-		const user = authModel.create({ lastname, firstname, email, password });
+		const user = authModel.create({ email, password });
 		// Renvoie une réponse positive si l'utilisateur est bien enregistrer
 		res.status(201).json({ message: 'Utilisateur créer avec succès', user });
 	} catch (error) {
