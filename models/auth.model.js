@@ -8,14 +8,10 @@ const bcrypt = require('bcryptjs');
 const validator = require('validator');
 
 // Définition du shéma de l utilisateur
-const userSchema = new mongoose.Schema({
-	lastname: {
-		type: String,
-		required: [true, 'Veuillez entrer votre nom de famille'],
-	},
-	firstname: {
-		type: String,
-		required: [true, 'Veuillez entrer votre prénom'],
+const authSchema = new mongoose.Schema({
+	user: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: 'User',
 	},
 	email: {
 		type: String,
@@ -43,7 +39,7 @@ const userSchema = new mongoose.Schema({
 });
 
 // Hachage du mot de passe avant de sauvegarder l utilisateur
-userSchema.pre('save', async function (next) {
+authSchema.pre('save', async function (next) {
 	try {
 		if (!this.isModified('password')) {
 			return next();
@@ -57,7 +53,7 @@ userSchema.pre('save', async function (next) {
 });
 
 // Méthode pour comparer le mot de passe
-userSchema.methods.comparePassword = async function (paramPassword) {
+authSchema.methods.comparePassword = async function (paramPassword) {
 	try {
 		return await bcrypt.compare(paramPassword, this.password);
 	} catch (error) {
@@ -65,8 +61,8 @@ userSchema.methods.comparePassword = async function (paramPassword) {
 	}
 };
 
-// Export du model et du schema et mis dans la variable user
-const User = mongoose.model('User', userSchema);
+// Export du model et du schema et mis dans la variable auth
+const Auth = mongoose.model('Auth', authSchema);
 
-// Export de la variable user
-module.exports = User;
+// Export de la variable auth
+module.exports = Auth;

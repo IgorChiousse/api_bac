@@ -88,11 +88,29 @@ module.exports.deleteBill = async (req, res) => {
 		}
 		// Récupérer l id de la facture
 		const billId = req.params.id;
-		// Supprimer la facture
+		// Récuperation de l'id de la facture par rapport au model
+		const bill = await billModel.findById(billId);
+		// Vérifier si le produit existe
+		if (!bill) {
+			return res.status(404).json({ message: 'Facture non trouvé' });
+		}
+		// Rechercher l'id de l'image sur cloudinary
+		const imagePublicId = bill.imagePublicId;
+
+		// Suppression de la facture
 		const deletedBill = await billModel.findByIdAndDelete(billId);
+
 		// Condition si la facture est introuvable
 		if (!deletedBill) {
 			return res.status(404).json({ message: 'facture non trouvée' });
+		}
+		console.log('Image Public ID:', imagePublicId);
+		console.log('Facture supprimé avec succès');
+
+		// Suppression de l'image dans cloudinary
+		if (imagePublicId) {
+			await cloudinary.uploader.destroy(imagePublicId);
+			console.log('Image supprimé de cloudinary avec succès');
 		}
 		res.status(200).json({ message: 'Facture supprimer avec succès' });
 	} catch (error) {
@@ -127,11 +145,12 @@ module.exports.updateBill = async (req, res) => {
 		// Vérifier si une nouvelle image est téléchargé, mettre à jour le chemin de l image
 		if (req.file) {
 			// Supprimer l'ancienne image
-			if (existingBill.image) {
-				fs.unlinkSync(existingBill.image);
+			if (existingBill.imagePublicId) {
+				await cloudinary.uploader.destroy(existingBill.imagePublicId);
 			}
-			// Redonne un chemin a la nouvelle image
-			existingBill.imageUrl = req.file.path;
+			// Redonne une nouvelle url et un nouveau Id a la nouvelle image
+			existingBill.imageUrl = req.cloudinaryUrl;
+			existingBill.imagePublicId = req.file.public_id;
 		}
 		// Enregistrement des modification dans la base de données
 		const updateBill = await existingBill.save();

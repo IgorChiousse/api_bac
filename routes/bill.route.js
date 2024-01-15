@@ -26,11 +26,6 @@ router.get('/all-bill', billController.getAllBills);
 router.get('/bill/:id', billController.getBillById);
 
 // Route pour supprimer une facture uniquement par l admin
-router.delete(
-	'/delete-bill/:id',
-	authMiddleware.authenticate,
-	cloudinaryUpload,
-	billController.deleteBill
-);
+router.delete('/delete-bill/:id', authMiddleware.authenticate, billController.deleteBill);
 
 module.exports = router;

@@ -1,32 +1,40 @@
 // Import de mongoose pour la gestion avec la base de données
 const mongoose = require('mongoose');
 
-// Définition du shéma du produit
-const billSchema = new mongoose.Schema({
-	createdBy: {
-		type: mongoose.Schema.Types.ObjectId,
-		ref: 'Auth',
+// Définition du shéma de user
+const userSchema = new mongoose.Schema({
+	lastname: {
+		type: String,
+		required: true,
 	},
-	title: {
+	firstname: {
+		type: String,
+		required: true,
+	},
+	birthday: {
 		type: String,
 		required: [true, 'Veuillez entrer votre produit'],
 	},
-	description: {
+	address: {
 		type: String,
 		required: [true, 'Veuillez entrer votre description'],
 	},
-	price: {
+	zipcode: {
 		type: Number,
 		required: [true, 'Veuillez entrer votre prix'],
 	},
-	date: {
+	city: {
 		type: String,
-		default: Date.now,
+		required: true,
 	},
-	imageUrl: {
+	phone: {
+		type: String,
+		required: true,
+	},
+	avatarUrl: {
 		type: String,
 	},
-	imagePublicId: {
+	avatarPublicId: {
 		type: String,
 		default: null,
 	},
@@ -37,7 +45,7 @@ const billSchema = new mongoose.Schema({
 });
 
 // Export du model et du schema et mis dans la variable user
-const Bill = mongoose.model('Bill', billSchema);
+const User = mongoose.model('User', userSchema);
 
 // Export de la variable user
-module.exports = Bill;
+module.exports = User;
