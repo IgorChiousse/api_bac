@@ -7,7 +7,7 @@ const cloudinaryUpload = require('../middleware/cloudinaryUpload');
 router.post(
 	'/create-bill',
 	authMiddleware.authenticate,
-	cloudinaryUpload.single('image'),
+	cloudinaryUpload,
 	billController.createBill
 );
 
@@ -15,7 +15,7 @@ router.post(
 router.put(
 	'/update-bill/:id',
 	authMiddleware.authenticate,
-	cloudinaryUpload.single('image'),
+	cloudinaryUpload,
 	billController.updateBill
 );
 

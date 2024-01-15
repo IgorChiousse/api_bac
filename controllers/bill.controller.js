@@ -1,6 +1,6 @@
 // Import du model utilisateur
 const billModel = require('../models/bill.model');
-const fs = require('fs');
+const cloudinary = require('cloudinary').v2;
 
 // Fonction pour la creation de facture (accessible seulement par l administrateur)
 module.exports.createBill = async (req, res) => {
@@ -15,13 +15,15 @@ module.exports.createBill = async (req, res) => {
 		// Récupération des données du formulaire
 		const { title, description, price, date } = req.body;
 		// Vérification si une image est téléchargé
-		if (!req.file) {
+		if (!req.cloudinaryUrl || !req.file) {
 			return res.status(400).json({ message: 'veuillez télécharger une image' });
 		}
-		// Déclaration de variable pour récupérer le chemin de l'image après téléchargement
-		const imageUrl = req.file.path;
+
 		// Déclaration de variable pour récupérer l'id de l'utilisateur qui va poster une facture
 		const userId = req.user._id;
+		// Utilisation de l url de cloudinary et du public_id provenant du middleware
+		const imageUrl = req.cloudinaryUrl;
+		const imagePublicId = req.file.public_id;
 		// Création d une facture
 		const newBill = await billModel.create({
 			title,
@@ -29,6 +31,7 @@ module.exports.createBill = async (req, res) => {
 			price,
 			date,
 			imageUrl,
+			imagePublicId,
 			createdBy: userId,
 		});
 		// Renvoie une réponse positif si la facture est bien enregistrer
