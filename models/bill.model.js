@@ -16,7 +16,7 @@ const billSchema = new mongoose.Schema({
 		required: [true, 'Veuillez entrer votre description'],
 	},
 	price: {
-		type: Number,
+		type: String,
 		required: [true, 'Veuillez entrer votre prix'],
 	},
 	date: {

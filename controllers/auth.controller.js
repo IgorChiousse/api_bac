@@ -10,8 +10,8 @@ const bcrypt = require('bcryptjs');
 // Import du model jwt pour les tokens
 const jwt = require('jsonwebtoken');
 
-// Import du module validator pour email
-const validator = require('validator');
+// Import du module cloudinary
+const cloudinary = require('cloudinary').v2;
 
 // fonction pour l inscription
 module.exports.register = async (req, res) => {
@@ -25,32 +25,43 @@ module.exports.register = async (req, res) => {
 			return res.status(400).json({ errors: errors.array() });
 		}
 		// Récupération des données du formulaire
-		const { email, password } = req.body;
+		const { lastname, firstname, birthday, address, zipcode, city, phone, email, password } =
+			req.body;
 
-		// Vérification de la longueur du mot de passe avec une condition
-		if (password.length < 6) {
-			// Vérification de la longueur du mot de passe (6carractere minimum)
-			// Renvoie une erreure si le mot de passe est trop court
-			return res
-				.status(400)
-				.json({ message: 'le mot de passe doit contenir au moins 6 caractère' });
-		}
-		// Vérification de la validité de l email avec validator
-		if (!validator.isEmail(email)) {
-			// Renvoie une erreur si l email est invalide
-			return res.status(400).json({ message: 'Entrer un email valide' });
+		// Vérifier si une image est téléchargée
+		if (!req.cloudinaryUrl || !req.file) {
+			return res.status(400).json({ message: 'Veuillez télécharger une image' });
 		}
 		// Vérification de l email si il existe deja dans la base de données
-		const existingUser = await authModel.findOne({ email });
+		const existingAuth = await authModel.findOne({ email });
 		// Renvoie une erreur si l email exist deja
-		if (existingUser) {
+		if (existingAuth) {
 			return res.status(400).json({ message: "l'email existe deja" });
 		}
+
+		// Utilisation de l'Url de cloudinary et du public_id provenant du middleware
+		const avatarUrl = req.cloudinaryUrl;
+		const avatarPublicId = req.file.public_id;
+
 		// Création d un nouvel utilisateur
-		const user = authModel.create({ email, password });
+		const auth = authModel.create({
+			lastname,
+			firstname,
+			birthday,
+			address,
+			zipcode,
+			city,
+			phone,
+			email,
+			password,
+			avatarUrl,
+			avatarPublicId,
+		});
+
 		// Renvoie une réponse positive si l'utilisateur est bien enregistrer
-		res.status(201).json({ message: 'Utilisateur créer avec succès', user });
+		res.status(201).json({ message: 'Utilisateur créer avec succès', auth });
 	} catch (error) {
+		console.error(error);
 		// Renvoie une erreur si il y a un probleme lors de l'enregistrement de l'utilisateur
 		res.status(500).json({ message: "Erreur lors de l enregistrement de l'/utilisateur" });
 	}

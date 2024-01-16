@@ -1,9 +1,10 @@
 const router = require('express').Router();
 const authController = require('../controllers/auth.controller');
 const authMiddleware = require('../middleware/authenticate');
+const cloudinaryUpload = require('../middleware/cloudinaryUpload');
 
 // Route pour l'inscription
-router.post('/register', authController.register);
+router.post('/register', cloudinaryUpload, authController.register);
 
 // Route pour la connection
 router.post('/login', authController.login);
@@ -27,3 +28,20 @@ router.get('/dashboard', authMiddleware.authenticate, (req, res) => {
 });
 
 module.exports = router;
+
+// Admin
+// Route pour ajouter les informations.
+// Route pour lire les informations.
+// Route pour modifier les informations.
+// Route pour supprimer le compte.
+
+// Admin 2
+// Route pour voir tous les utilisateurs.
+// Route pour modifier un utilisateur.
+// Route pour supprimer un utilisateur.
+
+// User
+// Route pour ajouter les informations.
+// Route pour lire les informations.
+// Route pour modifier les informations.
+// Route pour supprimer le compte.
