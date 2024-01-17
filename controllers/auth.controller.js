@@ -265,3 +265,18 @@ module.exports.getUserById = async (req, res) => {
 		res.status(500).jso, { message: "Erreur lors de la récupération de l'utilisateur" };
 	}
 };
+
+module.exports.profil = async (req, res) => {
+	try {
+		const userId = req.params.id;
+		const user = await authModel.findById(userId);
+		if (!user) {
+			res.status(404).json({ message: 'profil récupérer avec succès' });
+		}
+		// Message de réussite
+		res.status(200).json({ message: 'profil récupérer avec succès', user });
+	} catch (error) {
+		console.error('Erreur lors de la récupération du profil: ', error.message);
+		res.status(500).jso, { message: 'Erreur lors de la récupération du profil' };
+	}
+};

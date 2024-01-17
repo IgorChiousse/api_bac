@@ -21,18 +21,9 @@ router.get('/dashboard', authMiddleware.authenticate, authController.dashboard);
 // Route pour accéder a tous les users en tant qu'admin
 router.get('/users', authMiddleware.authenticate, authController.getAllUsers);
 
-// Route pour avoir un utilisateur par l'id
+// Route pour avoir un utilisateur par l'id en tant qu'admin
 router.get('/user/:id', authMiddleware.authenticate, authController.getUserById);
 
+router.get('/profil/:id', authController.profil);
+
 module.exports = router;
-
-// Admin et user
-// Route pour ajouter les informations.
-// Route pour lire les informations.
-// Route pour modifier les informations.
-// Route pour supprimer le compte.
-
-// Admin 2
-// Route pour voir tous les utilisateurs.
-// Route pour modifier un utilisateur.
-// Route pour supprimer un utilisateur.
