@@ -36,6 +36,11 @@ module.exports.register = async (req, res) => {
 		const existingAuth = await authModel.findOne({ email });
 		// Renvoie une erreur si l email exist deja
 		if (existingAuth) {
+			// Suprimer l'image si elle existe
+			if (req.file && req.file.public_id) {
+				await cloudinary.uploader.destroy(req.file.public_id);
+				console.log('Image supprimer car email existant');
+			}
 			return res.status(400).json({ message: "l'email existe deja" });
 		}
 
@@ -61,7 +66,11 @@ module.exports.register = async (req, res) => {
 		// Renvoie une réponse positive si l'utilisateur est bien enregistrer
 		res.status(201).json({ message: 'Utilisateur créer avec succès', auth });
 	} catch (error) {
-		console.error(error);
+		console.error("Erreur lors de l'enregistrement de l'utilisateur : ", error.message);
+		// Suprimer l'image si elle existe
+		if (req.file && req.file.public_id) {
+			await cloudinary.uploader.destroy(req.file.public_id);
+		}
 		// Renvoie une erreur si il y a un probleme lors de l'enregistrement de l'utilisateur
 		res.status(500).json({ message: "Erreur lors de l enregistrement de l'/utilisateur" });
 	}

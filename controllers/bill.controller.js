@@ -40,6 +40,10 @@ module.exports.createBill = async (req, res) => {
 		// Appel de authModel pour
 	} catch (error) {
 		console.error('Erreur lors de la création de la facture: ', error.message);
+		// Suprimer l'image si elle existe
+		if (req.file && req.file.public_id) {
+			await cloudinary.uploader.destroy(req.file.public_id);
+		}
 		res.status(500).jso, { message: 'Erreur lors de la création de la facture' };
 	}
 };
