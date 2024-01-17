@@ -36,5 +36,6 @@ router.put(
 );
 
 // Route pour supprimer un profil en tant qu'admin
+router.delete('/delete-user/:id', authMiddleware.authenticate, authController.deleteUser);
 
 module.exports = router;
