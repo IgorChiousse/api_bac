@@ -121,7 +121,7 @@ module.exports.login = async (req, res) => {
 	}
 };
 
-// Fonction pour le dashboard
+// Fonction pour accéder à une route protégé
 module.exports.dashboard = async (req, res) => {
 	// Vérifier si l'utilisateur est un admin
 	if (req.user.role === 'admin') {
@@ -202,6 +202,7 @@ module.exports.update = async (req, res) => {
 	}
 };
 
+// Fonction pour supprimer mon profil
 module.exports.delete = async (req, res) => {
 	try {
 		// Déclaration de la variable qui va rechercher l'id de l'utilisateur pour mettre en params url
@@ -226,13 +227,14 @@ module.exports.delete = async (req, res) => {
 	}
 };
 
+// Fonction pour voir tous les utilisateur en tant qu'admin
 module.exports.getAllUsers = async (req, res) => {
 	try {
 		// Vérifier si l utilisateur est admin
 		if (req.user.role !== 'admin') {
 			// Retour d un message d erreur
 			return res.status(403).json({
-				message: 'Action non autorisé. Seul un admin peu récupérer un utilisateur',
+				message: 'Action non autorisé. Seul un admin peu voir un utilisateur',
 			});
 		}
 		const users = await authModel.find();
@@ -244,6 +246,7 @@ module.exports.getAllUsers = async (req, res) => {
 	}
 };
 
+// Fonction pour voir mon profil avec son id
 module.exports.getUserById = async (req, res) => {
 	try {
 		// Vérifier si l utilisateur est admin
@@ -266,17 +269,90 @@ module.exports.getUserById = async (req, res) => {
 	}
 };
 
-module.exports.profil = async (req, res) => {
+// Fonction pour voir mon profil
+module.exports.profile = async (req, res) => {
 	try {
 		const userId = req.params.id;
 		const user = await authModel.findById(userId);
 		if (!user) {
-			res.status(404).json({ message: 'profil récupérer avec succès' });
+			res.status(404).json({ message: 'profil non trouvé' });
 		}
 		// Message de réussite
 		res.status(200).json({ message: 'profil récupérer avec succès', user });
 	} catch (error) {
 		console.error('Erreur lors de la récupération du profil: ', error.message);
 		res.status(500).jso, { message: 'Erreur lors de la récupération du profil' };
+	}
+};
+
+// Fonction pour modifier un utilisateur en tant qu'admin
+module.exports.updateUser = async (req, res) => {
+	try {
+		// Vérifier si l utilisateur est admin
+		if (req.user.role !== 'admin') {
+			// Retour d un message d erreur
+			return res.status(403).json({
+				message: 'Action non autorisé. Seul un admin peu modifier un utilisateur',
+			});
+		}
+		// Déclaration de variable pour la gestion des erreurs de validation
+		const errors = validationResult(req);
+		// Vérification si il y a des erreurs de validation
+		if (!errors.isEmpty()) {
+			// Renvoie des erreurs de validation
+			return res.status(400).json({ errors: errors.array() });
+		}
+
+		// Récupération de l id de l'utilisateur pour le mettre en params de requête
+		const userId = req.params.id;
+
+		// Récupération des données du formulaire
+		const { lastname, firstname, birthday, address, zipcode, city, phone, email } = req.body;
+
+		// Vérifier si l utilisateur existe avant la mise à jour
+		const existingUser = await authModel.findById(userId);
+
+		// Condition si l'utilisateur n'existe pas en base de données
+		if (!existingUser) {
+			return res
+				.status(404)
+				.json({ message: 'Erreur lors de la mise à jour du profil utilisateur' });
+		}
+
+		// Vérifier si une nouvelle image est télécharger mettre à jour une nouvelle image
+		if (req.file) {
+			if (existingUser.avatarPublicId) {
+				await cloudinary.uploader.destroy(existingUser.avatarPublicId);
+			}
+			// Redonne une nouvelle url et un nouvel id a l'image
+			existingUser.avatarUrl = req.cloudinaryUrl;
+			existingUser.avatarPublicId = req.file.public_id;
+		}
+
+		// Mettre à jour les information de l'utilisateur
+		existingUser.lastname = lastname;
+		existingUser.firstname = firstname;
+		existingUser.birthday = birthday;
+		existingUser.address = address;
+		existingUser.zipcode = zipcode;
+		existingUser.city = city;
+		existingUser.phone = phone;
+
+		// Mettre à jour l email uniquement si fournis dans la requête
+		if (email) {
+			existingUser.email = email;
+		}
+
+		// Sauvegarder les modification
+		await existingUser.save();
+
+		// Code de réussite avec log
+		res.status(200).json({
+			message: 'Utilisateur lise à jour avec succès',
+			user: existingUser,
+		});
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({ message: 'Erreur de la mise à jour du profil utilisateuer' });
 	}
 };
