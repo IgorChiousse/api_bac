@@ -245,7 +245,8 @@ module.exports.update = async (req, res) => {
 		const userId = req.params.id;
 
 		// Récupération des données du formulaire
-		const { lastname, firstname, birthday, address, zipcode, city, phone, email } = req.body;
+		const { lastname, firstname, birthday, address, zipcode, city, phone, email, newPassword } =
+			req.body;
 
 		// Vérifier si l utilisateur existe avant la mise à jour
 		const existingUser = await authModel.findById(userId);
@@ -279,6 +280,11 @@ module.exports.update = async (req, res) => {
 		// Mettre à jour l email uniquement si fournis dans la requête
 		if (email) {
 			existingUser.email = email;
+		}
+
+		// Mettre à jour le mot de passe uniquement si fourni dans la requête
+		if (newPassword) {
+			existingUser.password = newPassword;
 		}
 
 		// Sauvegarder les modification
