@@ -70,7 +70,14 @@ const authSchema = new mongoose.Schema({
 	emailVerificationToken: {
 		type: String,
 	},
-	isEmailVerifiedExpires: {
+	emailVerificationTokenExpires: {
+		type: Date,
+	},
+	resetPasswordToken: {
+		type: String,
+		default: null,
+	},
+	resetPasswordTokenExpires: {
 		type: Date,
 	},
 	timestamp: {

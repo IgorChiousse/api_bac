@@ -32,6 +32,11 @@ const generateVerificationToken = () => {
 	return crypto.randomBytes(32).toString('hex');
 };
 
+// Déclaration de variable pour générer un token password avec crypto
+const generateVerificationTokenPassword = () => {
+	return crypto.randomBytes(32).toString('hex');
+};
+
 // Fonction de vérification email
 const sendVerificationEmail = async (to, verificationToken) => {
 	// Variable qui va contenir le lien de vérification
@@ -43,6 +48,59 @@ const sendVerificationEmail = async (to, verificationToken) => {
 		subject: 'Veuillez vérifier votre address email',
 		text: `Merci de verifier votre email en cliquant sur ce <a href=${verificationLink}>Lien</a>`,
 		html: `<p>Merci de cliquer sur ce lien pour verifier votre adresse email et pour vous connecter</p>`,
+	};
+
+	await transporter.sendMail(mailOptions);
+};
+
+// Fonction pour la demande de réinitialisation de motr de passe par email
+module.exports.forgotPassword = async (req, res) => {
+	try {
+		// Email que l'on va devoir entré dans postman pour recevoir l'email
+		const { email } = req.body;
+
+		// Rechercher l'utilisateur par email
+		const user = await authModel.findOne({ email });
+
+		// Condition si aucun utilisateur est trouvé avec cet email
+		if (!user) {
+			return res.status(404).json({ message: 'Aucun utilisateur trouvé avec cet email' });
+		}
+
+		// Générer un token nde réinitialisation de mot de passe sécurisé
+		const resetPasswordToken = generateVerificationTokenPassword();
+
+		// Enregistrer le token de réinisialisation de mot de passe et l'expiration dans la bdd
+		user.resetPasswordToken = resetPasswordToken;
+		user.resetPasswordTokenExpires = new Date(Date.now() + 60 * 60 * 1000);
+		await user.save();
+
+		// Envoyer un email avec le lien de réinitialisation de mot de passe
+		await sendResetPassword(user.email, resetPasswordToken);
+
+		// Message de réussite
+		res.status(200).json({
+			message:
+				'Un email de réinitialisation de mot de passe vous a été envoyer à votre adresse email',
+		});
+	} catch (error) {
+		console.error('Erruer lors de la réinitialisation du mot de passe : ', error.message);
+		res.status(500).json({
+			message: 'Erreur lors de la demande de réinitialisation de mot de passe',
+		});
+	}
+};
+
+// Fonction de vérification pour la réinitialisation du mot passe
+const sendResetPassword = async (to, resetPasswordToken) => {
+	// Variable qui va contenir le lien de vérification
+	const ResetPasswordLink = `http://localhost:5000/forgot-password?token=${resetPasswordToken}`;
+	const mailOptions = {
+		from: 'forgot-password@gmail.com',
+		to,
+		subject: 'Réinitialisation du mot de passe',
+		text: `Réinitialisation de votre mot de passe en cliquant sur ce <a href=${ResetPasswordLink}>Lien</a>`,
+		html: `<p>Merci de cliquer sur ce lien pour Réinitialisation votre mot de passe</p>`,
 	};
 
 	await transporter.sendMail(mailOptions);
@@ -103,7 +161,7 @@ module.exports.register = async (req, res) => {
 
 		// Sauvegarde le token générer dans la base de données et l'associer à l'utilisateur
 		auth.emailVerificationToken = verificationToken;
-		auth.isEmailVerifiedExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+		auth.emailVerificationTokenExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
 		// Sauvegarder
 		await auth.save();
@@ -140,7 +198,7 @@ module.exports.verifyEmail = async (req, res) => {
 			return res.status(404).json({ message: 'Utilisateur non trouvé' });
 		}
 		// Vérifier si le token n'a pas expiré
-		if (user.isEmailVerifiedExpires && user.isEmailVerifiedExpires < Date.now()) {
+		if (user.emailVerificationTokenExpires && user.emailVerificationTokenExpires < Date.now()) {
 			return res.status(400).json({ message: 'Le token à expiré' });
 		}
 		// Mettre à jour isEmailVerified à true et sauvegardé
@@ -148,7 +206,7 @@ module.exports.verifyEmail = async (req, res) => {
 		// Effacer le token après vérification
 		user.emailVerificationToken = undefined;
 		// Effacer la date d'expiration
-		user.isEmailVerifiedExpires = undefined;
+		user.emailVerificationTokenExpires = undefined;
 		// Sauvegarder
 		await user.save();
 
