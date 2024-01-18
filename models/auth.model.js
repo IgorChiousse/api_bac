@@ -63,6 +63,16 @@ const authSchema = new mongoose.Schema({
 		enum: ['user', 'admin'],
 		default: 'user',
 	},
+	isEmailVerified: {
+		type: Boolean,
+		default: false,
+	},
+	emailVerificationToken: {
+		type: String,
+	},
+	isEmailVerifiedExpires: {
+		type: Date,
+	},
 	timestamp: {
 		type: Date,
 		default: Date.now,

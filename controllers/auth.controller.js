@@ -13,6 +13,41 @@ const jwt = require('jsonwebtoken');
 // Import du module cloudinary
 const cloudinary = require('cloudinary').v2;
 
+// Import de nodemailer pour l'envoie de mail
+const nodemailer = require('nodemailer');
+
+const crypto = require('crypto');
+
+const transporter = nodemailer.createTransport({
+	host: 'sandbox.smtp.mailtrap.io',
+	port: 2525,
+	auth: {
+		user: process.env.MAILTRAP_USER,
+		pass: process.env.MAILTRAP_PASS,
+	},
+});
+
+// Déclaration de variable pour générer un token avec crypto
+const generateVerificationToken = () => {
+	return crypto.randomBytes(32).toString('hex');
+};
+
+// Fonction de vérification email
+const sendVerificationEmail = async (to, verificationToken) => {
+	// Variable qui va contenir le lien de vérification
+	const verificationLink = `http://localhost:5000/verify?token=${verificationToken}`;
+
+	const mailOptions = {
+		from: 'verificationEmail@gmail.com',
+		to,
+		subject: 'Veuillez vérifier votre address email',
+		text: `Merci de verifier votre email en cliquant sur ce <a href=${verificationLink}>Lien</a>`,
+		html: `<p>Merci de cliquer sur ce lien pour verifier votre adresse email et pour vous connecter</p>`,
+	};
+
+	await transporter.sendMail(mailOptions);
+};
+
 // fonction pour l inscription
 module.exports.register = async (req, res) => {
 	// Validation des données d'entrée
@@ -49,7 +84,7 @@ module.exports.register = async (req, res) => {
 		const avatarPublicId = req.file.public_id;
 
 		// Création d un nouvel utilisateur
-		const auth = authModel.create({
+		const auth = await authModel.create({
 			lastname,
 			firstname,
 			birthday,
@@ -63,8 +98,24 @@ module.exports.register = async (req, res) => {
 			avatarPublicId,
 		});
 
+		// Génération de la vérification de token sécurisé
+		const verificationToken = generateVerificationToken();
+
+		// Sauvegarde le token générer dans la base de données et l'associer à l'utilisateur
+		auth.emailVerificationToken = verificationToken;
+		auth.isEmailVerifiedExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+		// Sauvegarder 		await auth.save();
+
+		// Envoyer la vérification d'email
+		await sendVerificationEmail(auth.email, verificationToken);
+
 		// Renvoie une réponse positive si l'utilisateur est bien enregistrer
-		res.status(201).json({ message: 'Utilisateur créer avec succès', auth });
+		res.status(201).json({
+			message:
+				'Utilisateur créer avec succès. Vérifiez votre email pour activer votre compte',
+			auth,
+		});
 	} catch (error) {
 		console.error("Erreur lors de l'enregistrement de l'utilisateur : ", error.message);
 		// Suprimer l'image si elle existe
@@ -72,7 +123,7 @@ module.exports.register = async (req, res) => {
 			await cloudinary.uploader.destroy(req.file.public_id);
 		}
 		// Renvoie une erreur si il y a un probleme lors de l'enregistrement de l'utilisateur
-		res.status(500).json({ message: "Erreur lors de l enregistrement de l'/utilisateur" });
+		res.status(500).json({ message: "Erreur lors de l enregistrement de l'utilisateur" });
 	}
 };
 
