@@ -53,6 +53,21 @@ const sendVerificationEmail = async (to, verificationToken) => {
 	await transporter.sendMail(mailOptions);
 };
 
+// Fonction de vérification pour la réinitialisation du mot passe
+const sendResetPassword = async (to, resetPasswordToken) => {
+	// Variable qui va contenir le lien de vérification
+	const ResetPasswordLink = `http://localhost:5000/forgot-password?token=${resetPasswordToken}`;
+	const mailOptions = {
+		from: 'forgot-password@gmail.com',
+		to,
+		subject: 'Réinitialisation du mot de passe',
+		text: `Réinitialisation de votre mot de passe en cliquant sur ce <a href=${ResetPasswordLink}>Lien</a>`,
+		html: `<p>Merci de cliquer sur ce lien pour Réinitialisation votre mot de passe</p>`,
+	};
+
+	await transporter.sendMail(mailOptions);
+};
+
 // Fonction pour la demande de réinitialisation de motr de passe par email
 module.exports.forgotPassword = async (req, res) => {
 	try {
@@ -89,21 +104,6 @@ module.exports.forgotPassword = async (req, res) => {
 			message: 'Erreur lors de la demande de réinitialisation de mot de passe',
 		});
 	}
-};
-
-// Fonction de vérification pour la réinitialisation du mot passe
-const sendResetPassword = async (to, resetPasswordToken) => {
-	// Variable qui va contenir le lien de vérification
-	const ResetPasswordLink = `http://localhost:5000/forgot-password?token=${resetPasswordToken}`;
-	const mailOptions = {
-		from: 'forgot-password@gmail.com',
-		to,
-		subject: 'Réinitialisation du mot de passe',
-		text: `Réinitialisation de votre mot de passe en cliquant sur ce <a href=${ResetPasswordLink}>Lien</a>`,
-		html: `<p>Merci de cliquer sur ce lien pour Réinitialisation votre mot de passe</p>`,
-	};
-
-	await transporter.sendMail(mailOptions);
 };
 
 // fonction pour l inscription
