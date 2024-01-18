@@ -68,7 +68,7 @@ const sendResetPassword = async (to, resetPasswordToken) => {
 	await transporter.sendMail(mailOptions);
 };
 
-// Fonction pour la demande de réinitialisation de motr de passe par email
+// Fonction pour la demande de réinitialisation de mot de passe par email
 module.exports.forgotPassword = async (req, res) => {
 	try {
 		// Email que l'on va devoir entré dans postman pour recevoir l'email
@@ -103,6 +103,47 @@ module.exports.forgotPassword = async (req, res) => {
 		res.status(500).json({
 			message: 'Erreur lors de la demande de réinitialisation de mot de passe',
 		});
+	}
+};
+
+// Fonction pour réinitialiser le mot de passe
+module.exports.updatePassword = async (req, res) => {
+	try {
+		// Récupération du token pour le mettre en params url
+		const { token } = req.params;
+		// Ajout de deux nouveaux champs dans la requête
+		const { newPassword, confirmNewPassword } = req.body;
+
+		// Vérifier si les champs de mot de passe correspondent
+		if (newPassword !== confirmNewPassword) {
+			return res.status(400).json({ message: 'Les mots de passe ne correspondent pas : ' });
+		}
+
+		// Trouver l'utilisateur par le token de réinitialisateur de mot de passe
+		const user = await authModel.findOne({
+			resetPasswordToken: token,
+			resetPasswordTokenExpires: { $gt: Date.now() },
+		});
+
+		// Vérifier si le token est valide
+		if (!user) {
+			return res
+				.status(400)
+				.json({ message: 'Token de réinitialisation invalide ou expiré' });
+		}
+		// Mettre à jour le mot de passe
+		user.password = newPassword;
+		// Réinitialiser le token de l'expiration
+		user.resetPasswordToken = undefined;
+		user.resetPasswordTokenExpires = undefined;
+		// Enregistrer les modification
+		await user.save();
+
+		// Envoyer une réponse de succès
+		res.status(200).json({ message: 'Mot de passe réinitialisé avec succès' });
+	} catch (error) {
+		console.error('Erreur lors de la réinitialisation du mot de passe', error.message);
+		res.status(500).json({ message: 'Erreur lors de la réinitialisation du mot de passe' });
 	}
 };
 
