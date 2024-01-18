@@ -105,7 +105,8 @@ module.exports.register = async (req, res) => {
 		auth.emailVerificationToken = verificationToken;
 		auth.isEmailVerifiedExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-		// Sauvegarder 		await auth.save();
+		// Sauvegarder
+		await auth.save();
 
 		// Envoyer la vérification d'email
 		await sendVerificationEmail(auth.email, verificationToken);
@@ -124,6 +125,38 @@ module.exports.register = async (req, res) => {
 		}
 		// Renvoie une erreur si il y a un probleme lors de l'enregistrement de l'utilisateur
 		res.status(500).json({ message: "Erreur lors de l enregistrement de l'utilisateur" });
+	}
+};
+
+// Fonction pour la vérification d'email
+module.exports.verifyEmail = async (req, res) => {
+	try {
+		// Récupération du token pour le mettre en paramettre d'URL
+		const { token } = req.params;
+
+		// Trouver l'utilisateur avec le token associé
+		const user = await authModel.findOne({ emailVerificationToken: token });
+		if (!user) {
+			return res.status(404).json({ message: 'Utilisateur non trouvé' });
+		}
+		// Vérifier si le token n'a pas expiré
+		if (user.isEmailVerifiedExpires && user.isEmailVerifiedExpires < Date.now()) {
+			return res.status(400).json({ message: 'Le token à expiré' });
+		}
+		// Mettre à jour isEmailVerified à true et sauvegardé
+		user.isEmailVerified = true;
+		// Effacer le token après vérification
+		user.emailVerificationToken = undefined;
+		// Effacer la date d'expiration
+		user.isEmailVerifiedExpires = undefined;
+		// Sauvegarder
+		await user.save();
+
+		// Message de réussite
+		res.status(200).json({ message: 'Email vérifier avec succès' });
+	} catch (error) {
+		console.error("Erreur lors de la vérification d'email ; ", error.message);
+		res.status(500).json({ message: "Erreur lors de la vérification d'email" });
 	}
 };
 
