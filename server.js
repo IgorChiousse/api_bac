@@ -41,10 +41,10 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 // Utilisation des routes pour l'authentification
-app.use('/api', authRoutes);
+app.use('/', authRoutes);
 
 // Utilisation des routes pour la creation des produits
-app.use('/api', billRoutes);
+app.use('/', billRoutes);
 
 // Configuration de cloudinary
 cloudinary.config({
@@ -70,3 +70,5 @@ const start = async () => {
 
 // Apple de la fonction pour demarrer le serveur
 start();
+
+module.exports = app;
