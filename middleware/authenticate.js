@@ -3,7 +3,7 @@ const authModel = require('../models/auth.model');
 // Import du JWT
 const jwt = require('jsonwebtoken');
 
-// fonction pour la gestion de role
+// Fonction pour la gestion de role
 module.exports.authenticate = async (req, res, next) => {
 	try {
 		// Définition de la variable pour l'autorisation

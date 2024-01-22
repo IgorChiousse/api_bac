@@ -7,7 +7,7 @@ const bcrypt = require('bcryptjs');
 // Import de validator pour validation d email
 const validator = require('validator');
 
-// Définition du shéma de l utilisateur
+// Définition du schéma de l utilisateur
 const authSchema = new mongoose.Schema({
 	lastname: {
 		type: String,
