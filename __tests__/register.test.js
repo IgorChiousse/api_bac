@@ -40,8 +40,8 @@ describe('register route test', () => {
 			.field('zipcode', '60410')
 			.field('city', 'verberie')
 			.field('phone', '0601020304')
-			.field('email', 'toto@gmail.com')
-			.field('password', '147852')
+			.field('email', 'igor@gmail.com')
+			.field('password', '123456')
 			// Attache un fichier à la requete (exemple image)
 			.attach('image', path.resolve(__dirname, '../image/image.png'));
 
