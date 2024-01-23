@@ -460,7 +460,7 @@ module.exports.getUserById = async (req, res) => {
 			res.status(404).json({ message: 'Utilisateur non trouvé' });
 		}
 		// Message de réussite
-		res.status(200).json({ message: 'Utilisateur récupérer avec succès', userId });
+		res.status(200).json({ message: 'Utilisateur récupérer avec succès', user });
 	} catch (error) {
 		console.error("Erreur lors de la récupération de l'utilisateur: ", error.message);
 		res.status(500).jso, { message: "Erreur lors de la récupération de l'utilisateur" };
