@@ -391,7 +391,7 @@ module.exports.update = async (req, res) => {
 
 		// Code de réussite avec log
 		res.status(200).json({
-			message: 'Utilisateur lise à jour avec succès',
+			message: 'Utilisateur mis à jour avec succès',
 			user: existingUser,
 		});
 	} catch (error) {
@@ -546,7 +546,7 @@ module.exports.updateUser = async (req, res) => {
 
 		// Code de réussite avec log
 		res.status(200).json({
-			message: 'Utilisateur lise à jour avec succès',
+			message: 'Utilisateur mis à jour avec succès',
 			user: existingUser,
 		});
 	} catch (error) {

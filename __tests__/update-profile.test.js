@@ -1,0 +1,67 @@
+// Import de mongoose
+const mongoose = require('mongoose');
+// Import supertest
+const request = require('supertest');
+// Import application
+const app = require('../server');
+// Import de JWT
+const jwt = require('jsonwebtoken');
+// Import model
+const authModel = require('../models/auth.model');
+// Mock de la méthode destroy de cloudinary pour éviter de supprimer réelement les fichier lors des tests
+jest.mock('cloudinary');
+// Connection à la base de données avant execution des test
+beforeAll(async () => {
+	// Utilisation de la méthode connect
+	await mongoose.connect(process.env.MONGO_URI);
+	// Attente d'une seconde pour assurer la connection a la base de données
+	await new Promise((resolve) => setTimeout(resolve, 1000));
+});
+// Fermeture de la connection après les tets
+afterAll(async () => {
+	// Utilisation de la méthode close
+	await mongoose.connection.close();
+});
+// Fonction utilisateur pour générer un token d'authentification
+function generateAuthToken(user) {
+	const secretKey = process.env.JWT_SECRET;
+	const expiresIn = '1h';
+	// Utilisation de JWT pour générer le token
+	return jwt.sign({ userId: user._id }, secretKey, { expiresIn });
+}
+// Bloc de test pour la route de mise à jour du profile
+describe('Update profile api', () => {
+	it('Should update the user profile', async () => {
+		// Entrer l'utilisateur existant en base de données (id)
+		const existingUserId = '65ae69c402cf0691c1aa59c4';
+		const existingUser = await authModel.findById(existingUserId);
+
+		expect(existingUser).toBeDefined();
+
+		// Générer un token
+		const authToken = generateAuthToken(existingUser);
+
+		// Utiliser supertest pour envoyer une requete PUT
+		const response = await request(app)
+			.put(`/api/update/${existingUserId}`)
+			.set('Authorization', `Bearer ${authToken}`)
+			.send({
+				lastname: 'Toto',
+				firstname: 'Caca',
+				birthday: '17-07-1980',
+				address: '17 rue de compiegne',
+				zipcode: '60200',
+				city: 'compiegne',
+				phone: '0701020304',
+				email: 'toto@gmail.com',
+			});
+		// Afficher le corp de la response en cas d'echec
+		if (response.status !== 200) {
+			console.error(response.body);
+		}
+		// S'assurer que la reponse est 200
+		expect(response.status).toBe(200);
+		expect(response.body).toHaveProperty('message', 'Utilisateur mis à jour avec succès');
+		expect(response.body).toHaveProperty('user');
+	});
+});
