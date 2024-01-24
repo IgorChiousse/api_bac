@@ -13,7 +13,7 @@ function generateAuthToken(userId, role) {
 	const secretKey = process.env.JWT_SECRET;
 	const expiresIn = '1h';
 	// Utilisation de JWT pour générer le token
-	return jwt.sign({ userId, role }, secretKey, { expiresIn });
+	return jwt.sign({ user: { id: userId }, role }, secretKey, { expiresIn });
 }
 
 // Connection à la base de données avant execution des test
@@ -49,7 +49,7 @@ describe('Dashboard api', () => {
 	// Test si l'utilisateur n'a pas le role admin
 	it('Should return an error for non-admin users trying to access the dashboard', async () => {
 		// Id d'un utilisateur non admin dans la base de données
-		const nonAdminUserId = '65ae69c402cf0691c1aa59c4';
+		const nonAdminUserId = '65b10db79d26a59db475b7b0';
 		// Générer un token
 		const authToken = generateAuthToken(nonAdminUserId, 'user');
 		// Faire la demande pour acceder au dashboard

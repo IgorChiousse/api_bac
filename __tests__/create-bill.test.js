@@ -17,12 +17,12 @@ const billModel = require('../models/bill.model');
 const path = require('path');
 
 // Fonction pour générer un token.
-function generateAuthToken(userId, role) {
+function generateAuthToken(userId) {
 	const secretKey = process.env.JWT_SECRET;
 	const expiresIn = '1h';
 
 	// Utilisation de jwt pour générer le token.
-	return jwt.sign({ userId, role }, secretKey, { expiresIn });
+	return jwt.sign({ user: { id: userId } }, secretKey, { expiresIn });
 }
 
 // Connexion à la BDD avant exécution des tests.
