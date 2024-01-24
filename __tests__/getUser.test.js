@@ -13,7 +13,7 @@ function generateAuthToken(userId) {
 	const secretKey = process.env.JWT_SECRET;
 	const expiresIn = '1h';
 	// Utilisation de JWT pour générer le token
-	return jwt.sign({ userId }, secretKey, { expiresIn });
+	return jwt.sign({ user: { userId } }, secretKey, { expiresIn });
 }
 
 // Connection à la base de données avant execution des test
