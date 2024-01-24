@@ -9,11 +9,11 @@ const jwt = require('jsonwebtoken');
 // Import model
 const authModel = require('../models/auth.model');
 // Fonction utilisateur pour générer un token d'authentification
-function generateAuthToken(userId, role) {
+function generateAuthToken(userId) {
 	const secretKey = process.env.JWT_SECRET;
 	const expiresIn = '1h';
 	// Utilisation de JWT pour générer le token
-	return jwt.sign({ userId, role }, secretKey, { expiresIn });
+	return jwt.sign({ user: { userId } }, secretKey, { expiresIn });
 }
 // Connection à la base de données avant execution des test
 beforeAll(async () => {
