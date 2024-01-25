@@ -6,12 +6,12 @@ const cloudinary = require('cloudinary').v2;
 module.exports.createBill = async (req, res) => {
 	try {
 		// Vérifier si l utilisateur est admin
-		if (req.user.role !== 'admin') {
-			// Retour d un message d erreur
-			return res
-				.status(403)
-				.json({ message: 'Action non autorisé. Seul un admin peu créer une facture' });
-		}
+		// if (req.user.role !== 'admin') {
+		// 	// Retour d un message d erreur
+		// 	return res
+		// 		.status(403)
+		// 		.json({ message: 'Action non autorisé. Seul un admin peu créer une facture' });
+		// }
 		// Récupération des données du formulaire
 		const { title, description, price, date } = req.body;
 		// Vérification si une image est téléchargé
@@ -84,12 +84,12 @@ module.exports.getBillById = async (req, res) => {
 module.exports.deleteBill = async (req, res) => {
 	try {
 		// Vérifier si l utilisateur est admin
-		if (req.user.role !== 'admin') {
-			// Retour d un message d erreur
-			return res
-				.status(403)
-				.json({ message: 'Action non autorisé. Seul un admin peu supprimer une facture' });
-		}
+		// if (req.user.role !== 'admin') {
+		// 	// Retour d un message d erreur
+		// 	return res
+		// 		.status(403)
+		// 		.json({ message: 'Action non autorisé. Seul un admin peu supprimer une facture' });
+		// }
 		// Récupérer l id de la facture
 		const billId = req.params.id;
 		// Récuperation de l'id de la facture par rapport au model
@@ -126,12 +126,12 @@ module.exports.deleteBill = async (req, res) => {
 module.exports.updateBill = async (req, res) => {
 	try {
 		// Vérifier si l utilisateur est admin
-		if (req.user.role !== 'admin') {
-			// Retour d un message d erreur
-			return res
-				.status(403)
-				.json({ message: 'Action non autorisé. Seul un admin peu modifier une facture' });
-		}
+		// if (req.user.role !== 'admin') {
+		// 	// Retour d un message d erreur
+		// 	return res
+		// 		.status(403)
+		// 		.json({ message: 'Action non autorisé. Seul un admin peu modifier une facture' });
+		// }
 		// Définition de la variable pour récupérer l'id de la facture en parametre d'url
 		const billId = req.params.id;
 		// Déclaration de variable pour vérifier si la facture existe en base de données
