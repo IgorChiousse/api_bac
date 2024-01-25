@@ -280,14 +280,29 @@ module.exports.login = async (req, res) => {
 			console.log('Utilisateur non trouvé');
 			return res.status(400).json({ message: 'Email invalide' });
 		}
+
+		// Vérifiacation si le compte est vérouillé
+		if (user.failedLoginAttempts >= 3) {
+			console.log('Compte vérouillé');
+			return res.status(400).json({ message: 'Compte verrouillé, Réésayez plus tard' });
+		}
+
 		// Verification du mot de passe
 		const isPasswordValid = await bcrypt.compare(password, user.password);
 
 		// Si le mot de passe est incorrect, renvoie une erreur
 		if (!isPasswordValid) {
 			console.log('Mot de passe incorrect');
+			//Fait en sorte de compter le nombre de tentative de connection avec un mauvais mot de passe
+			user.failedLoginAttempts += 1;
+			await user.save();
 			return res.status(400).json({ message: 'Mot de passe incorrect' });
 		}
+
+		// Réinitialisation du compteur du nombre de tentative en cas de connection réussi
+		user.failedLoginAttempts = 0;
+		await user.save();
+
 		// Renvoie d'un message de succes
 		console.log('Connection réussie !');
 
